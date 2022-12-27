@@ -23,31 +23,48 @@ package cmd
 
 import (
 	"fmt"
+	"html/template"
+	"net/http"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// serveCmd represents the serve command
-var serveCmd = &cobra.Command{
+// serverCmd represents the serve command
+var serverCmd = &cobra.Command{
 	Use:     "server",
 	Aliases: []string{"serve"},
 	Short:   "Starts the application server",
 	Long: `Current is a web application, which serves a site with all of the posts.
 The 'server' command starts serving the application on the specified host and port.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(viper.Get("server.port"))
+		tmpl := template.Must(template.ParseFiles("templates/layout.html"))
+
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			tmpl.Execute(w, nil)
+		})
+
+		fs := http.FileServer(http.Dir("static/"))
+		http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+		addr := fmt.Sprintf("%s:%d", viper.GetString("server.host"), viper.GetInt("server.port"))
+		fmt.Printf("http://%s\n", addr)
+		http.ListenAndServe(addr, nil)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(serveCmd)
+	rootCmd.AddCommand(serverCmd)
 	// Persistent Flags
-	serveCmd.PersistentFlags().IntP("port", "p", 3773, "port on which the server will listen")
+	serverCmd.PersistentFlags().String("host", "localhost", "host address on which the server will listen")
+	serverCmd.PersistentFlags().IntP("port", "p", 3773, "port on which the server will listen")
 
 	// Binding Persistent Flags to Viper
-	viper.BindPFlag("server.port", serveCmd.PersistentFlags().Lookup("port"))
+	viper.BindPFlag("server.port", serverCmd.PersistentFlags().Lookup("port"))
+	viper.BindPFlag("server.host", serverCmd.PersistentFlags().Lookup("host"))
 
 	// Binding Environment Variables to Viper
 	viper.BindEnv("server.port", "CRNT_SERVER_PORT")
+	viper.BindEnv("server.host", "CRNT_SERVER_HOST")
+
 }
