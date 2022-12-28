@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gomarkdown/markdown"
@@ -16,7 +17,7 @@ type ServerConfig struct {
 }
 
 type Post struct {
-	Time    int
+	Time    time.Time
 	Content []byte
 }
 
@@ -42,15 +43,15 @@ func Run() {
 
 		posts := []Post{
 			{
-				Time:    123456789,
+				Time:    time.Date(2022, 12, 28, 8, 30, 0, 0, time.UTC),
 				Content: []byte(`First **post**`),
 			},
 			{
-				Time:    234567890,
+				Time:    time.Date(2022, 12, 28, 8, 31, 0, 0, time.UTC),
 				Content: []byte(`Second *post*`),
 			},
 			{
-				Time:    345678901,
+				Time:    time.Date(2022, 12, 28, 8, 32, 0, 0, time.UTC),
 				Content: []byte("Third `post`"),
 			},
 		}
