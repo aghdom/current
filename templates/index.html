@@ -1,0 +1,12 @@
+{{define "content"}}
+{{if .Title}}
+    <h1>{{.Title}}</h1>
+{{end}}
+<div class="feed">
+{{range .Feed}}
+    <div class="post">
+        {{.}}
+    </div>
+{{end}}
+</div>
+{{end}}

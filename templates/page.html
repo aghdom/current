@@ -1,3 +1,4 @@
+{{define "page"}}
 <head>
 	<meta charset="utf-8">
 	<title>Dom's current</title>
@@ -12,12 +13,9 @@
         </nav>
     </header>
     <main>
-        <div class="feed">
-            {{range .Feed}}
-            <div class="post">
-                {{.}}
-            </div>
-            {{end}}
-        </div>
+        {{template "content" .}}
     </main>
+    <footer>
+    </footer>
 </body>
+{{end}}

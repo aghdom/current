@@ -12,3 +12,29 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
+
+header,
+h1,
+main {
+    width: calc(100% - 32px);
+    max-width: 860px;
+    margin: 1em auto;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header .logo {
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 1em;
+}
