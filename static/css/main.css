@@ -4,9 +4,16 @@ body {
 }
 
 body {
+    --primary-bg: #1d1e20;
+    --primary-text: #ebebeb;
+    --secondary-bg: #3d3e40;
+    --secondary-text: #a4a4a4;
+}
+
+body {
     font-family: system-ui, sans-serif;
-    color: white;
-    background-color: black;
+    color: var(--primary-text);
+    background-color: var(--primary-bg);
 
     display: flex;
     flex-direction: column;
@@ -39,6 +46,20 @@ nav {
     gap: 1em;
 }
 
+header a,
+header button {
+    display: inline;
+    background: transparent;
+    color: var(--primary-text);
+    text-decoration: none;
+}
+
+header a:hover,
+header button:hover {
+    text-decoration: underline;
+}
+
+
 h1 {
     margin-top: 0.75em;
     margin-bottom: 0.25em;
@@ -58,6 +79,17 @@ main {
     font-size: 14px;
     color: var(--secondary-text);
     margin-bottom: -.5em;
+}
+
+.post .post-time a {
+    color: var(--secondary-text);
+    text-decoration: none;
+    
+}
+
+.post .post-time a:hover {
+    text-decoration: underline;
+    
 }
 
 @media only screen and (min-width: 760px) {
