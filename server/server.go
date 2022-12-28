@@ -11,6 +11,23 @@ import (
 	"github.com/spf13/viper"
 )
 
+func getPosts() []Post {
+	return []Post{
+		{
+			Time:    time.Date(2022, 12, 28, 8, 30, 0, 0, time.UTC),
+			Content: []byte(`First **post**`),
+		},
+		{
+			Time:    time.Date(2022, 12, 28, 8, 31, 0, 0, time.UTC),
+			Content: []byte(`Second *post*`),
+		},
+		{
+			Time:    time.Date(2022, 12, 28, 8, 32, 0, 0, time.UTC),
+			Content: []byte("Third `post`"),
+		},
+	}
+}
+
 type ServerConfig struct {
 	Host string
 	Port int
@@ -21,9 +38,16 @@ type Post struct {
 	Content []byte
 }
 
-type FeedData struct {
+type FeedPost struct {
+	Date    string
+	Time    string
+	Unix    int64
+	Content template.HTML
+}
+
+type PageData struct {
 	Title string
-	Feed  []template.HTML
+	Feed  []FeedPost
 }
 
 func initConfig() ServerConfig {
@@ -41,27 +65,19 @@ func Run() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("templates/index.html", "templates/page.html"))
 
-		posts := []Post{
-			{
-				Time:    time.Date(2022, 12, 28, 8, 30, 0, 0, time.UTC),
-				Content: []byte(`First **post**`),
-			},
-			{
-				Time:    time.Date(2022, 12, 28, 8, 31, 0, 0, time.UTC),
-				Content: []byte(`Second *post*`),
-			},
-			{
-				Time:    time.Date(2022, 12, 28, 8, 32, 0, 0, time.UTC),
-				Content: []byte("Third `post`"),
-			},
-		}
-		fd := FeedData{
+		pd := PageData{
 			Title: "Dom's current",
 		}
-		for _, p := range posts {
-			fd.Feed = append(fd.Feed, template.HTML(markdown.ToHTML(p.Content, nil, nil)))
+		for _, p := range getPosts() {
+			fp := FeedPost{
+				Date:    p.Time.Format("2006/02/01"),
+				Time:    p.Time.Format("15:04"),
+				Unix:    p.Time.Unix(),
+				Content: template.HTML(markdown.ToHTML(p.Content, nil, nil)),
+			}
+			pd.Feed = append(pd.Feed, fp)
 		}
-		tmpl.ExecuteTemplate(w, "page", fd)
+		tmpl.ExecuteTemplate(w, "page", pd)
 	})
 
 	r.Get("/about", func(w http.ResponseWriter, r *http.Request) {

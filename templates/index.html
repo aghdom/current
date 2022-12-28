@@ -2,11 +2,19 @@
 {{if .Title}}
     <h1>{{.Title}}</h1>
 {{end}}
+<main>
 <div class="feed">
 {{range .Feed}}
     <div class="post">
-        {{.}}
+        <div class="post-time">
+            <a class="date" href="/on/{{.Date}}">{{.Date}}</a>
+            <a class="time" href="/posts/{{.Unix}}">{{.Time}}</a>
+        </div>
+        <div class="post-content">
+            {{.Content}}
+        </div>
     </div>
 {{end}}
 </div>
+</main>
 {{end}}
