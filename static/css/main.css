@@ -1,4 +1,14 @@
+html,
 body {
+    margin: 0;
+}
+
+body {
+    font-family: system-ui, sans-serif;
     color: white;
     background-color: black;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }

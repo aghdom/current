@@ -8,11 +8,16 @@
     <header>
         <a href="/" class="logo">the current</a>
         <nav>
+            <a href="/about">about</a>
         </nav>
     </header>
     <main>
         <div class="feed">
-
+            {{range .Feed}}
+            <div class="post">
+                {{.}}
+            </div>
+            {{end}}
         </div>
     </main>
 </body>
