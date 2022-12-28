@@ -22,18 +22,11 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"html/template"
-	"net/http"
-
-	"github.com/gomarkdown/markdown"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-)
 
-type StatusData struct {
-	Feed []template.HTML
-}
+	"github.com/aghdom/current/server"
+)
 
 // serverCmd represents the serve command
 var serverCmd = &cobra.Command{
@@ -46,26 +39,7 @@ The 'server' command starts serving the application on the specified host and po
 }
 
 func runServer(cmd *cobra.Command, args []string) {
-	tmpl := template.Must(template.ParseFiles("templates/layout.html"))
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		md := []byte("## Testing \nStatus **update**")
-		md2 := []byte("Another _status_: [link](https://example.com)")
-		sd := StatusData{
-			Feed: []template.HTML{
-				template.HTML(markdown.ToHTML(md, nil, nil)),
-				template.HTML(markdown.ToHTML(md2, nil, nil)),
-			},
-		}
-		tmpl.Execute(w, sd)
-	})
-
-	fs := http.FileServer(http.Dir("static/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	addr := fmt.Sprintf("%s:%d", viper.GetString("server.host"), viper.GetInt("server.port"))
-	fmt.Printf("http://%s\n", addr)
-	http.ListenAndServe(addr, nil)
+	server.Run()
 }
 
 func init() {
