@@ -1,8 +1,11 @@
 package server
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
+	"io/fs"
+	"log"
 	"net/http"
 	"time"
 
@@ -58,6 +61,18 @@ func initConfig() ServerConfig {
 	return cfg
 }
 
+func transformPost(post Post) FeedPost {
+	return FeedPost{
+		Date:    post.Time.Format("2006/02/01"),
+		Time:    post.Time.Format("15:04"),
+		Unix:    post.Time.Unix(),
+		Content: template.HTML(markdown.ToHTML(post.Content, nil, nil)),
+	}
+}
+
+//go:embed static/*
+var staticFS embed.FS
+
 func Run() {
 	cfg := initConfig()
 	r := chi.NewRouter()
@@ -69,13 +84,7 @@ func Run() {
 			Title: "Dom's current",
 		}
 		for _, p := range getPosts() {
-			fp := FeedPost{
-				Date:    p.Time.Format("2006/02/01"),
-				Time:    p.Time.Format("15:04"),
-				Unix:    p.Time.Unix(),
-				Content: template.HTML(markdown.ToHTML(p.Content, nil, nil)),
-			}
-			pd.Feed = append(pd.Feed, fp)
+			pd.Feed = append(pd.Feed, transformPost(p))
 		}
 		tmpl.ExecuteTemplate(w, "page", pd)
 	})
@@ -85,10 +94,15 @@ func Run() {
 		tmpl.ExecuteTemplate(w, "page", nil)
 	})
 
-	// server static files
-	fs := http.FileServer(http.Dir("static/"))
+	// serve embeded static files
+	sFS, err := fs.Sub(staticFS, "static")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fs := http.FileServer(http.FS(sFS))
 	r.Handle("/s/*", http.StripPrefix("/s/", fs))
 
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	fmt.Println("Serving on http://" + addr + " ...")
 	http.ListenAndServe(addr, r)
 }
