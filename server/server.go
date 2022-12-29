@@ -124,7 +124,7 @@ func Run() {
 		for _, p := range getPosts() {
 			if p.Time == tm {
 				pd.Feed = append(pd.Feed, transformPost(p))
-				pd.Title = p.Time.Format("2006/02/01 15:04")
+				pd.Title = p.Time.Format("2006/01/02 15:04")
 			}
 		}
 		tmpl.ExecuteTemplate(w, "page", pd)
