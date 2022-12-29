@@ -102,7 +102,7 @@ func Run() {
 	fs := http.FileServer(http.FS(sFS))
 	r.Handle("/s/*", http.StripPrefix("/s/", fs))
 
-	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	fmt.Println("Serving on http://" + addr + " ...")
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	fmt.Println("Listening on " + addr)
 	http.ListenAndServe(addr, r)
 }
