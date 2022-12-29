@@ -52,6 +52,7 @@ header button {
     background: transparent;
     color: var(--primary-text);
     text-decoration: none;
+    padding: 0.5em 0;
 }
 
 header a:hover,
