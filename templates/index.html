@@ -7,8 +7,8 @@
 {{range .Feed}}
     <div class="post">
         <div class="post-time">
-            <a class="date" href="/on/{{.Date}}">{{.Date}}</a>
-            <a class="time" href="/posts/{{.Unix}}">{{.Time}}</a>
+            <a class="date" href="/on/{{.Date}}" title="Posts on this date">{{.Date}}</a>
+            <a class="time" href="/posts/{{.Unix}}" title="Link to this post">{{.Time}}</a>
         </div>
         <div class="post-content">
             {{.Content}}
