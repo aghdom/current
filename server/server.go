@@ -14,41 +14,15 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gomarkdown/markdown"
 	"github.com/spf13/viper"
+
+	"github.com/aghdom/current/data"
 )
-
-var posts = []Post{
-	{
-		Time:    time.Date(2022, 12, 28, 8, 30, 0, 0, time.UTC),
-		Content: []byte(`First **post**`),
-	},
-	{
-		Time:    time.Date(2022, 12, 28, 8, 31, 0, 0, time.UTC),
-		Content: []byte(`Second *post*`),
-	},
-	{
-		Time:    time.Date(2022, 12, 28, 8, 32, 0, 0, time.UTC),
-		Content: []byte("Third `post`"),
-	},
-}
-
-func getPosts() *[]Post {
-	return &posts
-}
-
-func removePost(index int) {
-	posts = append(posts[:index], posts[index+1:]...)
-}
 
 type ServerConfig struct {
 	Host          string
 	Port          int
 	AdminUsername string
 	AdminPassword string
-}
-
-type Post struct {
-	Time    time.Time
-	Content []byte
 }
 
 type FeedPost struct {
@@ -76,7 +50,7 @@ func initConfig() ServerConfig {
 	return cfg
 }
 
-func transformPost(post Post) FeedPost {
+func transformPost(post data.Post) FeedPost {
 	return FeedPost{
 		Date:    post.Time.Format("2006/01/02"),
 		Time:    post.Time.Format("15:04"),
@@ -87,16 +61,6 @@ func transformPost(post Post) FeedPost {
 
 //go:embed static/*
 var staticFS embed.FS
-
-func inTimeSpan(start, end, check time.Time) bool {
-	if start.Before(end) {
-		return !check.Before(start) && !check.After(end)
-	}
-	if start.Equal(end) {
-		return check.Equal(start)
-	}
-	return !start.After(check) || !end.Before(check)
-}
 
 func getAdminCreds(cfg ServerConfig) map[string]string {
 	return map[string]string{cfg.AdminUsername: cfg.AdminPassword}
@@ -112,7 +76,7 @@ func Run() {
 		pd := PageData{
 			Title: "Dom's current",
 		}
-		for _, p := range *getPosts() {
+		for _, p := range *data.GetPosts() {
 			pd.Feed = append(pd.Feed, transformPost(p))
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)
@@ -128,16 +92,20 @@ func Run() {
 		if ts != "" {
 			unix, err := strconv.ParseInt(ts, 10, 64)
 			if err != nil {
+				//TODO: Handle properly
 				log.Fatal(err)
 			}
 			tm = time.Unix(unix, 0).UTC()
 		}
-		var pd PageData
-		for _, p := range *getPosts() {
-			if p.Time == tm {
-				pd.Feed = append(pd.Feed, transformPost(p))
-				pd.Title = p.Time.Format("2006/01/02 15:04")
-			}
+		p, ok := data.GetPostByTime(tm)
+		if !ok {
+			//TODO: Implement better 404 handling
+			tmpl.ExecuteTemplate(w, "index", PageData{Title: "Post not found!"})
+			return
+		}
+		pd := PageData{
+			Title: p.Time.Format("2006/01/02 15:04"),
+			Feed:  []FeedPost{transformPost(p)},
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)
 	})
@@ -150,18 +118,21 @@ func Run() {
 		if y != "" {
 			year, err = strconv.ParseInt(y, 10, 0)
 			if err != nil {
+				//TODO: Handle properly
 				log.Fatal(err)
 			}
 		}
 		if m != "" {
 			month, err = strconv.ParseInt(m, 10, 0)
 			if err != nil {
+				//TODO: Handle properly
 				log.Fatal(err)
 			}
 		}
 		if d != "" {
 			day, err = strconv.ParseInt(d, 10, 0)
 			if err != nil {
+				//TODO: Handle properly
 				log.Fatal(err)
 			}
 		}
@@ -170,11 +141,9 @@ func Run() {
 		pd := PageData{
 			Title: "Posts on " + tm.Format("2006/01/02"),
 		}
-
-		for _, p := range *getPosts() {
-			if inTimeSpan(tm, tm.Add(24*time.Hour), p.Time) {
-				pd.Feed = append(pd.Feed, transformPost(p))
-			}
+		posts := data.GetPostOnDate(tm)
+		for _, p := range posts {
+			pd.Feed = append(pd.Feed, transformPost(p))
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)
 	})
@@ -187,33 +156,20 @@ func Run() {
 		})
 
 		r.Post("/author/post", func(w http.ResponseWriter, r *http.Request) {
-			post := Post{
-				Time:    time.Now().Truncate(time.Second).UTC(),
-				Content: []byte(r.FormValue("content")),
-			}
-			posts := getPosts()
-			*posts = append(*posts, post)
-
+			data.CreatePost(r.FormValue("content")) // Should empty content be allowed?
 			// Redirect back to the admin portal
 			w.Header().Add("Location", "/author")
 			w.WriteHeader(http.StatusSeeOther)
 		})
 
 		r.Post("/author/delete", func(w http.ResponseWriter, r *http.Request) {
-			posts := getPosts()
 			ts, err := strconv.ParseInt(r.FormValue("time"), 10, 64)
 			if err != nil {
+				//TODO: Handle properly
 				log.Fatal(err)
 			}
 			tm := time.Unix(int64(ts), 0).UTC()
-			var to_delete int
-			for i, p := range *posts {
-				if p.Time == tm {
-					to_delete = i
-				}
-			}
-			removePost(to_delete)
-
+			data.DeletePostByTime(tm)
 			// Redirect back to the admin portal
 			w.Header().Add("Location", "/author")
 			w.WriteHeader(http.StatusSeeOther)
