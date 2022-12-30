@@ -70,13 +70,15 @@ func Run() {
 	cfg := initConfig()
 	r := chi.NewRouter()
 	tmpl := template.Must(template.ParseGlob("templates/*"))
+	// TODO: This should be refactored to be only called once and not on every startup
+	data.InitDB()
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 
 		pd := PageData{
 			Title: "Dom's current",
 		}
-		for _, p := range *data.GetPosts() {
+		for _, p := range data.GetPosts() {
 			pd.Feed = append(pd.Feed, transformPost(p))
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)

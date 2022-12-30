@@ -13,11 +13,16 @@ processes = []
 
 [env]
   CRNT_SERVER_PORT = "3773"
+  CRNT_SQLITE_FILEPATH = "/db/current.db"
 
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
   cmd = ["current", "server"]
+
+[mounts]
+  source="current_data"
+  destination="/db"
 
 [[services]]
   http_checks = []

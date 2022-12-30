@@ -50,6 +50,9 @@ func init() {
 	serverCmd.Flags().String("admin_user", "", "username used for admin privileges")
 	serverCmd.Flags().String("admin_pass", "", "password used for admin privileges")
 
+	// Set defaults
+	viper.SetDefault("sqlite.filepath", "db/current.db")
+
 	// Binding Flags to Viper
 	viper.BindPFlag("server.port", serverCmd.Flags().Lookup("port"))
 	viper.BindPFlag("server.host", serverCmd.Flags().Lookup("host"))
@@ -61,5 +64,6 @@ func init() {
 	viper.BindEnv("server.host", "CRNT_SERVER_HOST")
 	viper.BindEnv("server.admin_user", "CRNT_SERVER_ADMIN_USER")
 	viper.BindEnv("server.admin_pass", "CRNT_SERVER_ADMIN_PASS")
+	viper.BindEnv("sqlite.filepath", "CRNT_SQLITE_FILEPATH")
 
 }
