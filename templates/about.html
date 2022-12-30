@@ -1,8 +1,15 @@
-{{define "content"}}
-<h1>About the current</h1>
-<main>
-    <div class="about">
-        <p>TODO</p>
-    </div>
-</main>
+{{define "about"}}
+<html>
+    {{template "head" .}}
+    <body>
+        {{template "header" .}}
+        <h1>About the current</h1>
+        <main>
+            <div class="about">
+                <p>TODO</p>
+            </div>
+        </main>
+        {{template "footer" .}}
+    </body>
+</html>
 {{end}}

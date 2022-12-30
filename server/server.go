@@ -87,9 +87,9 @@ func inTimeSpan(start, end, check time.Time) bool {
 func Run() {
 	cfg := initConfig()
 	r := chi.NewRouter()
+	tmpl := template.Must(template.ParseGlob("templates/*"))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/index.html", "templates/page.html"))
 
 		pd := PageData{
 			Title: "Dom's current",
@@ -97,16 +97,14 @@ func Run() {
 		for _, p := range getPosts() {
 			pd.Feed = append(pd.Feed, transformPost(p))
 		}
-		tmpl.ExecuteTemplate(w, "page", pd)
+		tmpl.ExecuteTemplate(w, "index", pd)
 	})
 
 	r.Get("/about", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/about.html", "templates/page.html"))
-		tmpl.ExecuteTemplate(w, "page", nil)
+		tmpl.ExecuteTemplate(w, "about", nil)
 	})
 
 	r.Get("/posts/{timestamp}", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/index.html", "templates/page.html"))
 		var tm time.Time
 		ts := chi.URLParam(r, "timestamp")
 		if ts != "" {
@@ -127,11 +125,10 @@ func Run() {
 				pd.Title = p.Time.Format("2006/01/02 15:04")
 			}
 		}
-		tmpl.ExecuteTemplate(w, "page", pd)
+		tmpl.ExecuteTemplate(w, "index", pd)
 	})
 
 	r.Get("/on/{year}/{month}/{day}", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/index.html", "templates/page.html"))
 		var year, month, day int64
 		var err error
 		y, m, d := chi.URLParam(r, "year"), chi.URLParam(r, "month"), chi.URLParam(r, "day")
@@ -165,7 +162,7 @@ func Run() {
 				pd.Feed = append(pd.Feed, transformPost(p))
 			}
 		}
-		tmpl.ExecuteTemplate(w, "page", pd)
+		tmpl.ExecuteTemplate(w, "index", pd)
 	})
 
 	// serve embeded static files

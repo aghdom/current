@@ -1,20 +1,27 @@
-{{define "content"}}
-{{if .Title}}
-    <h1>{{.Title}}</h1>
-{{end}}
-<main>
-<div class="feed">
-{{range .Feed}}
-    <div class="post">
-        <div class="post-time">
-            <a class="date" href="/on/{{.Date}}" title="Posts on this date">{{.Date}}</a>
-            <a class="time" href="/posts/{{.Unix}}" title="Link to this post">{{.Time}}</a>
+{{define "index"}}
+<html>
+    {{template "head" .}}
+    <body>
+        {{template "header" .}}
+        {{if .Title}}
+            <h1>{{.Title}}</h1>
+        {{end}}
+        <main>
+        <div class="feed">
+        {{range .Feed}}
+            <div class="post">
+                <div class="post-time">
+                    <a class="date" href="/on/{{.Date}}" title="Posts on this date">{{.Date}}</a>
+                    <a class="time" href="/posts/{{.Unix}}" title="Link to this post">{{.Time}}</a>
+                </div>
+                <div class="post-content">
+                    {{.Content}}
+                </div>
+            </div>
+        {{end}}
         </div>
-        <div class="post-content">
-            {{.Content}}
-        </div>
-    </div>
-{{end}}
-</div>
-</main>
+        </main>
+        {{template "footer" .}}
+    </body>
+</html>
 {{end}}
