@@ -45,15 +45,21 @@ func runServer(cmd *cobra.Command, args []string) {
 func init() {
 	rootCmd.AddCommand(serverCmd)
 	// Persistent Flags
-	serverCmd.PersistentFlags().String("host", "localhost", "host address on which the server will listen")
-	serverCmd.PersistentFlags().IntP("port", "p", 3773, "port on which the server will listen")
+	serverCmd.Flags().String("host", "localhost", "host address on which the server will listen")
+	serverCmd.Flags().IntP("port", "p", 3773, "port on which the server will listen")
+	serverCmd.Flags().String("admin_user", "", "username used for admin privileges")
+	serverCmd.Flags().String("admin_pass", "", "password used for admin privileges")
 
-	// Binding Persistent Flags to Viper
-	viper.BindPFlag("server.port", serverCmd.PersistentFlags().Lookup("port"))
-	viper.BindPFlag("server.host", serverCmd.PersistentFlags().Lookup("host"))
+	// Binding Flags to Viper
+	viper.BindPFlag("server.port", serverCmd.Flags().Lookup("port"))
+	viper.BindPFlag("server.host", serverCmd.Flags().Lookup("host"))
+	viper.BindPFlag("server.admin_user", serverCmd.Flags().Lookup("admin_user"))
+	viper.BindPFlag("server.admin_pass", serverCmd.Flags().Lookup("admin_pass"))
 
 	// Binding Environment Variables to Viper
 	viper.BindEnv("server.port", "CRNT_SERVER_PORT")
 	viper.BindEnv("server.host", "CRNT_SERVER_HOST")
+	viper.BindEnv("server.admin_user", "CRNT_SERVER_ADMIN_USER")
+	viper.BindEnv("server.admin_pass", "CRNT_SERVER_ADMIN_PASS")
 
 }

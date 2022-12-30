@@ -11,30 +11,39 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gomarkdown/markdown"
 	"github.com/spf13/viper"
 )
 
-func getPosts() []Post {
-	return []Post{
-		{
-			Time:    time.Date(2022, 12, 28, 8, 30, 0, 0, time.UTC),
-			Content: []byte(`First **post**`),
-		},
-		{
-			Time:    time.Date(2022, 12, 28, 8, 31, 0, 0, time.UTC),
-			Content: []byte(`Second *post*`),
-		},
-		{
-			Time:    time.Date(2022, 12, 28, 8, 32, 0, 0, time.UTC),
-			Content: []byte("Third `post`"),
-		},
-	}
+var posts = []Post{
+	{
+		Time:    time.Date(2022, 12, 28, 8, 30, 0, 0, time.UTC),
+		Content: []byte(`First **post**`),
+	},
+	{
+		Time:    time.Date(2022, 12, 28, 8, 31, 0, 0, time.UTC),
+		Content: []byte(`Second *post*`),
+	},
+	{
+		Time:    time.Date(2022, 12, 28, 8, 32, 0, 0, time.UTC),
+		Content: []byte("Third `post`"),
+	},
+}
+
+func getPosts() *[]Post {
+	return &posts
+}
+
+func removePost(index int) {
+	posts = append(posts[:index], posts[index+1:]...)
 }
 
 type ServerConfig struct {
-	Host string
-	Port int
+	Host          string
+	Port          int
+	AdminUsername string
+	AdminPassword string
 }
 
 type Post struct {
@@ -56,8 +65,13 @@ type PageData struct {
 
 func initConfig() ServerConfig {
 	cfg := ServerConfig{
-		Host: viper.GetString("server.host"),
-		Port: viper.GetInt("server.port"),
+		Host:          viper.GetString("server.host"),
+		Port:          viper.GetInt("server.port"),
+		AdminUsername: viper.GetString("server.admin_user"),
+		AdminPassword: viper.GetString("server.admin_pass"),
+	}
+	if cfg.AdminPassword == "" || cfg.AdminUsername == "" {
+		log.Fatal("Missing admin credentials!")
 	}
 	return cfg
 }
@@ -84,6 +98,10 @@ func inTimeSpan(start, end, check time.Time) bool {
 	return !start.After(check) || !end.Before(check)
 }
 
+func getAdminCreds(cfg ServerConfig) map[string]string {
+	return map[string]string{cfg.AdminUsername: cfg.AdminPassword}
+}
+
 func Run() {
 	cfg := initConfig()
 	r := chi.NewRouter()
@@ -94,7 +112,7 @@ func Run() {
 		pd := PageData{
 			Title: "Dom's current",
 		}
-		for _, p := range getPosts() {
+		for _, p := range *getPosts() {
 			pd.Feed = append(pd.Feed, transformPost(p))
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)
@@ -114,12 +132,10 @@ func Run() {
 			}
 			tm = time.Unix(unix, 0).UTC()
 		}
-
-		pd := PageData{
-			Title: "Dom's current",
-		}
-
-		for _, p := range getPosts() {
+		fmt.Println(tm)
+		var pd PageData
+		for i, p := range *getPosts() {
+			fmt.Println(i, p.Time)
 			if p.Time == tm {
 				pd.Feed = append(pd.Feed, transformPost(p))
 				pd.Title = p.Time.Format("2006/01/02 15:04")
@@ -157,12 +173,53 @@ func Run() {
 			Title: "Posts on " + tm.Format("2006/01/02"),
 		}
 
-		for _, p := range getPosts() {
+		for _, p := range *getPosts() {
 			if inTimeSpan(tm, tm.Add(24*time.Hour), p.Time) {
 				pd.Feed = append(pd.Feed, transformPost(p))
 			}
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)
+	})
+
+	// admin endpoints
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.BasicAuth("author", getAdminCreds(cfg)))
+		r.Get("/author", func(w http.ResponseWriter, r *http.Request) {
+			tmpl.ExecuteTemplate(w, "author", nil)
+		})
+
+		r.Post("/author/post", func(w http.ResponseWriter, r *http.Request) {
+			post := Post{
+				Time:    time.Now().Truncate(time.Second).UTC(),
+				Content: []byte(r.FormValue("content")),
+			}
+			posts := getPosts()
+			*posts = append(*posts, post)
+
+			// Redirect back to the admin portal
+			w.Header().Add("Location", "/author")
+			w.WriteHeader(http.StatusSeeOther)
+		})
+
+		r.Post("/author/delete", func(w http.ResponseWriter, r *http.Request) {
+			posts := getPosts()
+			ts, err := strconv.ParseInt(r.FormValue("time"), 10, 64)
+			if err != nil {
+				log.Fatal(err)
+			}
+			tm := time.Unix(int64(ts), 0).UTC()
+			var to_delete int
+			for i, p := range *posts {
+				if p.Time == tm {
+					to_delete = i
+				}
+			}
+			removePost(to_delete)
+
+			// Redirect back to the admin portal
+			w.Header().Add("Location", "/author")
+			w.WriteHeader(http.StatusSeeOther)
+		})
 	})
 
 	// serve embeded static files

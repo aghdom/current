@@ -71,6 +71,62 @@ main {
     margin-bottom: 3em;
 }
 
+input,
+button,
+textarea {
+    font-size: 1em;
+    padding: .5em .8em;
+    color: var(--primary-text);
+    font-family: system-ui, sans-serif;
+    tab-size: 4;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--secondary-text);
+}
+
+form {
+    position: relative;
+    margin-bottom: 2em;
+    overflow: hidden;
+    padding: .5em;
+}
+
+form input,
+form textarea {
+    display: block;
+    border-radius: 5px;
+    border: 0;
+    background: var(--secondary-bg);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+form textarea {
+    min-height: 30vh;
+    line-height: 1.5em;
+    resize: vertical;
+}
+
+form input:focus,
+form textarea:focus {
+    outline: 0;
+}
+
+form button[type="submit"] {
+    border-radius: 5px;
+    border: 0;
+    color: var(--primary-bg);
+    background: var(--primary-text);
+    margin-top: .5em;
+    float: right;
+}
+
+form button[type="submit"]:hover {
+    background: var(--secondary-text);
+}
+
 .post {
     margin-bottom: 2.5em;
     word-break: break-word;
