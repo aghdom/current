@@ -176,7 +176,7 @@ func Run() {
 		})
 	})
 
-	// serve embeded static files
+	// serve embedded static files
 	sFS, err := fs.Sub(staticFS, "static")
 	if err != nil {
 		log.Fatal(err)
