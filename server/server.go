@@ -132,10 +132,8 @@ func Run() {
 			}
 			tm = time.Unix(unix, 0).UTC()
 		}
-		fmt.Println(tm)
 		var pd PageData
-		for i, p := range *getPosts() {
-			fmt.Println(i, p.Time)
+		for _, p := range *getPosts() {
 			if p.Time == tm {
 				pd.Feed = append(pd.Feed, transformPost(p))
 				pd.Title = p.Time.Format("2006/01/02 15:04")
