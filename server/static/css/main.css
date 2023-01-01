@@ -1,3 +1,5 @@
+/* Heavily inspired by https://github.com/thesephist/stream/blob/main/static/css/main.css */
+
 html,
 body {
     margin: 0;
@@ -169,4 +171,22 @@ form button[type="submit"]:hover {
     .post-content :first-child {
         margin-top: 0;
     }
+}
+
+.pagination {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: .5em;
+
+}
+
+.pagination a {
+    display: inline;
+    color: var(--primary-text);
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    text-decoration: underline;
 }

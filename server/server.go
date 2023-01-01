@@ -33,8 +33,10 @@ type FeedPost struct {
 }
 
 type PageData struct {
-	Title string
-	Feed  []FeedPost
+	Title    string
+	Feed     []FeedPost
+	PrevPage int
+	NextPage int
 }
 
 func initConfig() ServerConfig {
@@ -74,11 +76,32 @@ func Run() {
 	data.InitDB()
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-
-		pd := PageData{
-			Title: "Dom's current",
+		var pageNum int64
+		var err error
+		pArg := r.URL.Query().Get("p")
+		if pArg == "" {
+			pageNum = 1
+		} else {
+			pageNum, err = strconv.ParseInt(pArg, 10, 0)
+			if err != nil {
+				// TODO: Handle properly
+				log.Fatal(err)
+			}
+			if pageNum < 1 {
+				pageNum = 1
+			}
 		}
-		for _, p := range data.GetPosts() {
+		pd := PageData{
+			Title:    "Dom's current",
+			PrevPage: int(pageNum) - 1,
+		}
+		postCount := data.CountPosts()
+		if postCount > int(pageNum)*10 {
+			pd.NextPage = int(pageNum) + 1
+		}
+
+		posts := data.GetPosts(int(pageNum), 10)
+		for _, p := range posts {
 			pd.Feed = append(pd.Feed, transformPost(p))
 		}
 		tmpl.ExecuteTemplate(w, "index", pd)

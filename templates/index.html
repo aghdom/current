@@ -20,6 +20,14 @@
             </div>
         {{end}}
         </div>
+        <div class="pagination">
+            {{if .PrevPage}}
+                <a href="/?p={{.PrevPage}}" title="Previous page" accesskey="p">prev</a>
+            {{end}}
+            {{if .NextPage}}
+                <a href="/?p={{.NextPage}}" title="Next page" accesskey="n">next</a>
+            {{end}}
+        </div>
         </main>
         {{template "footer" .}}
     </body>

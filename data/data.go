@@ -36,6 +36,28 @@ func InitDB() {
 	}
 }
 
+func CountPosts() int {
+	fp := viper.GetString("sqlite.filepath")
+	db, err := sql.Open("sqlite3", fp)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT COUNT(ts) AS count FROM posts")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+	rows.Next()
+	var count int
+	if err := rows.Scan(&count); err != nil {
+		log.Fatal(err)
+	}
+	return count
+}
+
 func queryPosts(query string, args ...any) []Post {
 	fp := viper.GetString("sqlite.filepath")
 	var result []Post
@@ -64,8 +86,8 @@ func queryPosts(query string, args ...any) []Post {
 	return result
 }
 
-func GetPosts() []Post {
-	return queryPosts("SELECT ts,content FROM posts ORDER BY ts DESC")
+func GetPosts(page, count int) []Post {
+	return queryPosts("SELECT ts,content FROM posts ORDER BY ts DESC LIMIT ?,?", count*(page-1), count)
 }
 
 func GetPostByTime(tm time.Time) (Post, bool) {
