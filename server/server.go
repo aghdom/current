@@ -75,6 +75,10 @@ func Run() {
 	// TODO: This should be refactored to be only called once and not on every startup
 	data.InitDB()
 
+	// Register middleware
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Recoverer)
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		var pageNum int64
 		var err error
@@ -84,8 +88,8 @@ func Run() {
 		} else {
 			pageNum, err = strconv.ParseInt(pArg, 10, 0)
 			if err != nil {
-				// TODO: Handle properly
-				log.Fatal(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 			if pageNum < 1 {
 				pageNum = 1
@@ -117,8 +121,8 @@ func Run() {
 		if ts != "" {
 			unix, err := strconv.ParseInt(ts, 10, 64)
 			if err != nil {
-				//TODO: Handle properly
-				log.Fatal(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 			tm = time.Unix(unix, 0).UTC()
 		}
@@ -143,22 +147,22 @@ func Run() {
 		if y != "" {
 			year, err = strconv.ParseInt(y, 10, 0)
 			if err != nil {
-				//TODO: Handle properly
-				log.Fatal(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 		}
 		if m != "" {
 			month, err = strconv.ParseInt(m, 10, 0)
 			if err != nil {
-				//TODO: Handle properly
-				log.Fatal(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 		}
 		if d != "" {
 			day, err = strconv.ParseInt(d, 10, 0)
 			if err != nil {
-				//TODO: Handle properly
-				log.Fatal(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 		}
 
@@ -190,8 +194,8 @@ func Run() {
 		r.Post("/author/delete", func(w http.ResponseWriter, r *http.Request) {
 			ts, err := strconv.ParseInt(r.FormValue("time"), 10, 64)
 			if err != nil {
-				//TODO: Handle properly
-				log.Fatal(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 			tm := time.Unix(int64(ts), 0).UTC()
 			data.DeletePostByTime(tm)

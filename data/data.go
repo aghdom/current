@@ -92,7 +92,7 @@ func GetPosts(page, count int) []Post {
 
 func GetPostByTime(tm time.Time) (Post, bool) {
 	posts := queryPosts("SELECT ts,content FROM posts WHERE ts == ? ORDER BY ts DESC", tm.Unix())
-	if len(posts) >= 0 {
+	if len(posts) > 0 {
 		return posts[0], true
 	}
 	return Post{}, false
