@@ -10,6 +10,9 @@ body {
     --primary-text: #ebebeb;
     --secondary-bg: #3d3e40;
     --secondary-text: #a4a4a4;
+    --code-bg: #323232;
+    --code-text: #c3c3c3;
+
 }
 
 body {
@@ -149,6 +152,96 @@ form button[type="submit"]:hover {
 .post .post-time a:hover {
     text-decoration: underline;
     
+}
+
+/* Markdown styling */
+
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+    margin: .75em 0 .5em 0;
+}
+
+.post-content h1 {
+    font-size: 1.75em;
+}
+
+.post-content h2 {
+    font-size: 1.5em;
+}
+
+.post-content h3 {
+    font-size: 1.2em;
+}
+
+.post-content p,
+.post-content li {
+    line-height: 1.5em;
+    max-width: 64ch;
+}
+
+.post-content ul,
+.post-content ol {
+    padding-left: 3ch;
+}
+
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+    font-size: 1em;
+}
+
+.post-content a {
+    color: var(--primary-text);
+    text-decoration: underline;
+}
+
+.post-content s,
+.post-content del,
+.post-content strike {
+    color: var(--secondary-text);
+}
+
+
+.post-content code,
+.post-content pre {
+    color: var(--code-text);
+    background: var(--code-bg);
+    font-size: 1em;
+    font-family: 'Fira Code', 'IBM Plex Mono', 'Menlo', 'Monaco', monospace;
+    word-break: initial;
+}
+
+.post-content pre {
+    border-radius: 6px;
+    box-sizing: border-box;
+    max-height: 20ch;
+    padding: 12px 8px;
+    overflow-x: auto;
+}
+
+.post-content pre code {
+    padding: 0;
+}
+
+.post-content code {
+    padding: 2px 5px;
+    border-radius: 6px;
+}
+
+
+.post-content blockquote {
+    margin: 0;
+    color: var(--code-text);
+    border-left: 4px solid var(--code-bg);
+    padding-left: 1em;
+    display: block;
+}
+
+.post-content img {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 6px;
 }
 
 @media only screen and (min-width: 760px) {

@@ -52,12 +52,21 @@ func initConfig() ServerConfig {
 	return cfg
 }
 
+func parseMd(md []byte) []byte {
+	md = markdown.NormalizeNewlines(md)
+
+	// exts := parser.CommonExtensions // parser.OrderedListStart | parser.NoEmptyLineBeforeBlock
+	// p := parser.NewWithExtensions(exts)
+
+	return markdown.ToHTML(md, nil, nil)
+}
+
 func transformPost(post data.Post) FeedPost {
 	return FeedPost{
 		Date:    post.Time.Format("2006/01/02"),
 		Time:    post.Time.Format("15:04"),
 		Unix:    post.Time.Unix(),
-		Content: template.HTML(markdown.ToHTML(post.Content, nil, nil)),
+		Content: template.HTML(parseMd(post.Content)),
 	}
 }
 
