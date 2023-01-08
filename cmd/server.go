@@ -49,6 +49,7 @@ func init() {
 	serverCmd.Flags().IntP("port", "p", 3773, "port on which the server will listen")
 	serverCmd.Flags().String("admin_user", "", "username used for admin privileges")
 	serverCmd.Flags().String("admin_pass", "", "password used for admin privileges")
+	serverCmd.Flags().StringP("filepath", "f", "", "filepath for the SQLite DB file")
 
 	// Set defaults
 	viper.SetDefault("sqlite.filepath", "db/current.db")
@@ -58,6 +59,7 @@ func init() {
 	viper.BindPFlag("server.host", serverCmd.Flags().Lookup("host"))
 	viper.BindPFlag("server.admin_user", serverCmd.Flags().Lookup("admin_user"))
 	viper.BindPFlag("server.admin_pass", serverCmd.Flags().Lookup("admin_pass"))
+	viper.BindPFlag("sqlite.filepath", serverCmd.Flags().Lookup("filepath"))
 
 	// Binding Environment Variables to Viper
 	viper.BindEnv("server.port", "CRNT_SERVER_PORT")

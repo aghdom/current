@@ -86,7 +86,10 @@ func queryPosts(query string, args ...any) []Post {
 	return result
 }
 
-func GetPosts(page, count int) []Post {
+func GetPosts(page, count int, query string) []Post {
+	if query != "" {
+		return queryPosts("SELECT ts,content FROM posts WHERE content LIKE ? ORDER BY ts DESC LIMIT ?,?", "%"+query+"%", count*(page-1), count)
+	}
 	return queryPosts("SELECT ts,content FROM posts ORDER BY ts DESC LIMIT ?,?", count*(page-1), count)
 }
 

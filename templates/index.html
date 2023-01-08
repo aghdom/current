@@ -7,6 +7,9 @@
             <h1>{{.Title}}</h1>
         {{end}}
         <main>
+        {{if .Search}}
+            {{template "search" .}}
+        {{end}}
         <div class="feed">
         {{range .Feed}}
             <div class="post">

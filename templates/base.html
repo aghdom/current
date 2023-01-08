@@ -20,6 +20,16 @@
 </header>
 {{end}}
 
+{{define "search"}}
+<form class="search" action="/" method="get">
+    <input type="text" name="q"
+        placeholder="Search the current..."
+        accesskey="s"
+        required autofocus />
+</form>
+{{end}}
+
+
 {{define "footer"}}
 <footer>
 </footer>

@@ -34,6 +34,7 @@ type FeedPost struct {
 
 type PageData struct {
 	Title    string
+	Search   bool
 	Feed     []FeedPost
 	PrevPage int
 	NextPage int
@@ -91,6 +92,7 @@ func Run() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		var pageNum int64
 		var err error
+		query := r.URL.Query().Get("q")
 		pArg := r.URL.Query().Get("p")
 		if pArg == "" {
 			pageNum = 1
@@ -106,14 +108,17 @@ func Run() {
 		}
 		pd := PageData{
 			Title:    "Dom's current",
+			Search:   true,
 			PrevPage: int(pageNum) - 1,
+		}
+		if query != "" {
+			pd.Title = fmt.Sprintf("Search '%s'", query)
 		}
 		postCount := data.CountPosts()
 		if postCount > int(pageNum)*10 {
 			pd.NextPage = int(pageNum) + 1
 		}
-
-		posts := data.GetPosts(int(pageNum), 10)
+		posts := data.GetPosts(int(pageNum), 10, query)
 		for _, p := range posts {
 			pd.Feed = append(pd.Feed, transformPost(p))
 		}
