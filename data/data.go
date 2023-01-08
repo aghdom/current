@@ -36,15 +36,14 @@ func InitDB() {
 	}
 }
 
-func CountPosts() int {
+func CountPosts(query string) int {
 	fp := viper.GetString("sqlite.filepath")
 	db, err := sql.Open("sqlite3", fp)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
-	rows, err := db.Query("SELECT COUNT(ts) AS count FROM posts")
+	rows, err := db.Query("SELECT COUNT(ts) AS count FROM posts WHERE content LIKE ?", "%"+query+"%")
 	if err != nil {
 		log.Fatal(err)
 	}

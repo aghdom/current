@@ -114,7 +114,7 @@ func Run() {
 		if query != "" {
 			pd.Title = fmt.Sprintf("Search '%s'", query)
 		}
-		postCount := data.CountPosts()
+		postCount := data.CountPosts(query)
 		if postCount > int(pageNum)*10 {
 			pd.NextPage = int(pageNum) + 1
 		}
