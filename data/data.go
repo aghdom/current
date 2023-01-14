@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/gomarkdown/markdown"
+	"github.com/gorilla/feeds"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/viper"
 )
@@ -141,4 +143,55 @@ func deletePost(tm time.Time) {
 
 func DeletePostByTime(tm time.Time) {
 	deletePost(tm)
+}
+
+func getFeed() *feeds.Feed {
+	feed := &feeds.Feed{
+		Title:       "aghdom's current",
+		Link:        &feeds.Link{Href: "https://current.aghdom.eu/"},
+		Description: "My personal micro-blog",
+		Author:      &feeds.Author{Name: "Dominik Ágh", Email: "agh.dominik@gmail.com"},
+	}
+
+	posts := queryPosts("SELECT ts,content FROM posts ORDER BY ts DESC")
+	feed.Created = posts[0].Time
+
+	for _, post := range posts {
+		feed.Items = append(feed.Items, &feeds.Item{
+			Title:   post.Time.Format("2006/01/02 15:04"),
+			Link:    &feeds.Link{Href: fmt.Sprintf("https://current.aghdom.eu/posts/%d", post.Time.Unix())},
+			Author:  &feeds.Author{Name: "Dominik Ágh", Email: "agh.dominik@gmail.com"},
+			Content: string(markdown.ToHTML(markdown.NormalizeNewlines(post.Content), nil, nil)),
+			Created: post.Time,
+		})
+	}
+
+	return feed
+}
+
+func GetAtomFeed() []byte {
+	feed := getFeed()
+	atom, err := feed.ToAtom()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return []byte(atom)
+}
+
+func GetRssFeed() []byte {
+	feed := getFeed()
+	rss, err := feed.ToRss()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return []byte(rss)
+}
+
+func GetJsonFeed() []byte {
+	feed := getFeed()
+	json, err := feed.ToJSON()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return []byte(json)
 }

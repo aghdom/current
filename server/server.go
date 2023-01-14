@@ -191,6 +191,23 @@ func Run() {
 		tmpl.ExecuteTemplate(w, "index", pd)
 	})
 
+	// alternate feeds
+	r.Get("/current.atom", func(w http.ResponseWriter, r *http.Request) {
+		feed := data.GetAtomFeed()
+		w.Header().Add("Content-Type", "application/atom+xml")
+		w.Write(feed)
+	})
+	r.Get("/index.xml", func(w http.ResponseWriter, r *http.Request) {
+		feed := data.GetRssFeed()
+		w.Header().Add("Content-Type", "application/rss+xml")
+		w.Write(feed)
+	})
+	r.Get("/index.json", func(w http.ResponseWriter, r *http.Request) {
+		feed := data.GetJsonFeed()
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(feed)
+	})
+
 	// admin endpoints
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.BasicAuth("author", getAdminCreds(cfg)))
