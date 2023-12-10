@@ -76,6 +76,10 @@ main {
     margin-bottom: 3em;
 }
 
+.subtle {
+    color: var(--secondary-text)
+}
+
 input,
 button,
 textarea {
