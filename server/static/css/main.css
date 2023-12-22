@@ -1,5 +1,7 @@
 /* Heavily inspired by https://github.com/thesephist/stream/blob/main/static/css/main.css */
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:opsz,wght@8..144,100;8..144,300;8..144,600&display=swap');
+ 
 html,
 body {
     margin: 0;
@@ -12,11 +14,13 @@ body {
     --secondary-text: #a4a4a4;
     --code-bg: #323232;
     --code-text: #c3c3c3;
+    --primary-font: 'Roboto Serif', ui-serif, serif;
+    --secondary-font: system-ui, sans-serif;
 
 }
 
 body {
-    font-family: system-ui, sans-serif;
+    font-family: var(--primary-font);
     color: var(--primary-text);
     background-color: var(--primary-bg);
 
@@ -67,6 +71,8 @@ header button:hover {
 
 
 h1 {
+    font-family: var(--secondary-font);
+    font-size: var(--step-3);
     margin-top: 0.75em;
     margin-bottom: 0.25em;
     line-height: 1.4em;
@@ -86,7 +92,7 @@ textarea {
     font-size: 1em;
     padding: .5em .8em;
     color: var(--primary-text);
-    font-family: system-ui, sans-serif;
+    font-family: var(--secondary-font);
     tab-size: 4;
 }
 
@@ -142,7 +148,8 @@ form button[type="submit"]:hover {
 }
 
 .post .post-time {
-    font-size: 14px;
+    font-family: var(--secondary-font);
+    font-size: var(--step--1);
     color: var(--secondary-text);
     margin-bottom: -.5em;
 }
@@ -167,19 +174,20 @@ form button[type="submit"]:hover {
 }
 
 .post-content h1 {
-    font-size: 1.75em;
+    font-size: var(--step-3);
 }
 
 .post-content h2 {
-    font-size: 1.5em;
+    font-size: var(--step-2);
 }
 
 .post-content h3 {
-    font-size: 1.2em;
+    font-size: var(--step-1);
 }
 
 .post-content p,
 .post-content li {
+    font-size: var(--step-0);
     line-height: 1.5em;
     max-width: 64ch;
 }
@@ -286,4 +294,40 @@ form button[type="submit"]:hover {
 
 .pagination a:hover {
     text-decoration: underline;
+}
+
+footer {
+    padding-top: 2em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+footer .divider {
+    padding: 0 0.5em;
+}
+footer a {
+    display: inline;
+    color: var(--primary-text);
+    background: transparent;
+    text-decoration: none;
+    padding: 0.5em 0;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Fluid type scale */
+/* @link https://utopia.fyi/type/calculator?c=320,16,1.2,1240,18,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+
+:root {
+  --step--2: clamp(0.6944rem, 0.6855rem + 0.0446vw, 0.72rem);
+  --step--1: clamp(0.8331rem, 0.8099rem + 0.1163vw, 0.9rem);
+  --step-0: clamp(1rem, 0.9565rem + 0.2174vw, 1.125rem);
+  --step-1: clamp(1.2rem, 1.1283rem + 0.3587vw, 1.4063rem);
+  --step-2: clamp(1.44rem, 1.3293rem + 0.5533vw, 1.7581rem);
+  --step-3: clamp(1.7281rem, 1.5649rem + 0.8163vw, 2.1975rem);
+  --step-4: clamp(2.0738rem, 1.8396rem + 1.1707vw, 2.7469rem);
+  --step-5: clamp(2.4881rem, 2.1594rem + 1.6435vw, 3.4331rem);
 }
