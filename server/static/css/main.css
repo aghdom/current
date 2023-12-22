@@ -82,6 +82,10 @@ main {
     margin-bottom: 3em;
 }
 
+.about .post-content{
+    width: auto;
+}
+
 .subtle {
     color: var(--secondary-text)
 }

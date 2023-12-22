@@ -3,10 +3,26 @@
     {{template "head" .}}
     <body>
         {{template "header" .}}
-        <h1>About the current</h1>
-        <main>
-            <div class="about">
-                <p>TODO</p>
+        <h1>About '<code>current</code>'</h1>
+        <main class="about">
+            <div class="post-content">
+                <p>
+                    <code>current</code> is a micro-blogging platform, which I created for myself. I tend to post about things that I find interesting,
+                    so primarily about things I learn in the software development space, possibly books I'm currently reading, 
+                    but in general anything that passes an arbitrary threshold of what I feel is worth sharing.
+                    I took inspiration from other micro-blogs I stumbled upon, namely <a href="https://thesephist.com">thesephist</a>'s <a href="https://stream.thesephist.com">stream</a>.
+                </p>
+                <p>
+                    The main reason why I decided to create this app was just to have a small side-project, which I could play around with.
+                    A secondary reason was me moving away from most social-media and towards <a href="https://indieweb.org">independent web</a>, and so I wanted a place for short form content.
+                </p>
+                <p>
+                    The lack of "engagement" features (i.e. likes, comments, etc.) is here by design, so that I'm not motivated by them, and can stay "true" to just sharing what I deem worth it.
+                </p>
+                <p>
+                    For those interested, the whole source code is available on my <a href="https://github.com/aghdom/current">GitHub</a> under an MIT license, but the whole thing is rather simple,
+                    and if you want to start your own micro-blog, there are probably better <a href="https://micro.blog/">alternatives</a> available.
+                </p>
             </div>
         </main>
         {{template "footer" .}}
