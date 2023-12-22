@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/go-chi/chi/v5 v5.0.8
-	github.com/gomarkdown/markdown v0.0.0-20221013030248-663e2500819c
+	github.com/gomarkdown/markdown v0.0.0-20231115200524-a660076da3fd
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
