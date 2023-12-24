@@ -34,6 +34,7 @@ type FeedPost struct {
 
 type PageData struct {
 	Title    string
+	SubTitle string
 	Search   bool
 	Feed     []FeedPost
 	PrevPage int
@@ -108,6 +109,7 @@ func Run() {
 		}
 		pd := PageData{
 			Title:    "Dom's current",
+			SubTitle: "My personal micro-blog",
 			Search:   true,
 			PrevPage: int(pageNum) - 1,
 		}

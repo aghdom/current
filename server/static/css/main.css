@@ -1,6 +1,7 @@
 /* Heavily inspired by https://github.com/thesephist/stream/blob/main/static/css/main.css */
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:opsz,wght@8..144,100;8..144,300;8..144,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@300;600&display=swap');
  
 html,
 body {
@@ -15,7 +16,7 @@ body {
     --code-bg: #323232;
     --code-text: #c3c3c3;
     --primary-font: 'Roboto Serif', ui-serif, serif;
-    --secondary-font: system-ui, sans-serif;
+    --secondary-font: 'Dosis', system-ui, sans-serif;
 
 }
 
@@ -35,6 +36,22 @@ main {
     width: calc(100% - 32px);
     max-width: 860px;
     margin: 1em auto;
+}
+
+.heading {
+    font-family: var(--secondary-font);
+    text-align: center;
+}
+
+.heading h1{
+    font-size: var(--step-5);
+}
+
+.heading h3 {
+    font-weight: normal;
+    color: var(--secondary-text);
+    font-size: var(--step-2);
+    margin: 0.5em 0;
 }
 
 header {
@@ -71,7 +88,6 @@ header button:hover {
 
 
 h1 {
-    font-family: var(--secondary-font);
     font-size: var(--step-3);
     margin-top: 0.75em;
     margin-bottom: 0.25em;
@@ -153,7 +169,7 @@ form button[type="submit"]:hover {
 
 .post .post-time {
     font-family: var(--secondary-font);
-    font-size: var(--step--1);
+    font-size: var(--step-0);
     color: var(--secondary-text);
     margin-bottom: -.5em;
 }

@@ -3,9 +3,14 @@
     {{template "head" .}}
     <body>
         {{template "header" .}}
+        <div class="heading">
         {{if .Title}}
             <h1>{{.Title}}</h1>
         {{end}}
+        {{if .SubTitle}}
+            <h3>{{.SubTitle}}</h3>
+        {{end}}
+        </div>
         <main>
         {{if .Search}}
             {{template "search" .}}
