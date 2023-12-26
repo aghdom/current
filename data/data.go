@@ -17,6 +17,7 @@ import (
 type Post struct {
 	Time    time.Time
 	Content []byte
+	BskyURI []byte
 }
 
 // runDBMigrationTX runs SQL database migration queries in a single transaction.
@@ -82,6 +83,10 @@ func InitDB() {
 	switch dbVersion {
 	case 0:
 		runDBMigrationTx(db, 0, []string{"CREATE TABLE IF NOT EXISTS posts(ts INTEGER PRIMARY KEY, content TEXT)"})
+		fallthrough
+	case 1:
+		// Introduced a 'bsky_uri' field to store BlueSky uri for deletion purposes in case of federation
+		runDBMigrationTx(db, 1, []string{"ALTER TABLE posts ADD bsky_uri TEXT"})
 	}
 }
 
@@ -134,6 +139,34 @@ func queryPosts(query string, args ...any) []Post {
 	return result
 }
 
+func queryPostsWithURI(query string, args ...any) []Post {
+	fp := viper.GetString("sqlite.filepath")
+	var result []Post
+	db, err := sql.Open("sqlite3", fp)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var post Post
+		var ts int64
+		if err := rows.Scan(&ts, &post.Content, &post.BskyURI); err != nil {
+			log.Fatal(err)
+		}
+		post.Time = time.Unix(ts, 0).Truncate(time.Second).UTC()
+		result = append(result, post)
+	}
+
+	return result
+}
+
 func GetPosts(page, count int, query string) []Post {
 	if query != "" {
 		return queryPosts("SELECT ts,content FROM posts WHERE content LIKE ? ORDER BY ts DESC LIMIT ?,?", "%"+query+"%", count*(page-1), count)
@@ -142,7 +175,7 @@ func GetPosts(page, count int, query string) []Post {
 }
 
 func GetPostByTime(tm time.Time) (Post, bool) {
-	posts := queryPosts("SELECT ts,content FROM posts WHERE ts == ? ORDER BY ts DESC", tm.Unix())
+	posts := queryPostsWithURI("SELECT ts,content,bsky_uri FROM posts WHERE ts == ? ORDER BY ts DESC", tm.Unix())
 	if len(posts) > 0 {
 		return posts[0], true
 	}
@@ -161,16 +194,26 @@ func insertPost(post Post) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO posts(ts, content) VALUES (?, ?);", post.Time.Unix(), post.Content)
+	_, err = db.Exec("INSERT INTO posts(ts, content, bsky_uri) VALUES (?, ?, ?);", post.Time.Unix(), post.Content, post.BskyURI)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func CreatePost(content string) {
+func CreatePost(content string, bskyFed bool) {
+	var bskyUri string
+	t := time.Now().UTC()
+	if bskyFed {
+		uri, err := BskyCreatePost(content, t)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bskyUri = uri
+	}
 	insertPost(Post{
-		Time:    time.Now().Truncate(time.Second).UTC(),
+		Time:    t.Truncate(time.Second),
 		Content: []byte(content),
+		BskyURI: []byte(bskyUri),
 	})
 }
 
@@ -188,7 +231,16 @@ func deletePost(tm time.Time) {
 	}
 }
 
-func DeletePostByTime(tm time.Time) {
+func DeletePostByTime(tm time.Time, bskyDel bool) {
+	if bskyDel {
+		post, ok := GetPostByTime(tm)
+		if !ok {
+			return
+		}
+		if err := BskyDeletePost(string(post.BskyURI)); err != nil {
+			log.Fatal(err)
+		}
+	}
 	deletePost(tm)
 }
 
