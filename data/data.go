@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -18,6 +19,37 @@ type Post struct {
 	Content []byte
 }
 
+// runDBMigrationTX runs SQL database migration queries in a single transaction.
+// It starts a new transaction in 'db' and executes the query strings in 'queries' one by one.
+// Lastly, it updates "user_version" to the next one after the current 'dbVersion'.
+func runDBMigrationTx(db *sql.DB, dbVersion int, queries []string) {
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Defer transaction rollback in case anything goes wrong
+	defer tx.Rollback()
+
+	//Execute migration queries
+	for _, query := range queries {
+		_, qErr := tx.ExecContext(ctx, query)
+		if qErr != nil {
+			log.Fatal(qErr)
+		}
+	}
+	// Increment DB version
+	newVersion := dbVersion + 1
+	_, err = tx.ExecContext(ctx, fmt.Sprintf("PRAGMA user_version = %d", newVersion))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Commit transaction
+	if err = tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
 func InitDB() {
 	fp := viper.GetString("sqlite.filepath")
 	if _, err := os.Stat(fp); os.IsNotExist(err) {
@@ -32,9 +64,24 @@ func InitDB() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS posts(ts INTEGER PRIMARY KEY, content TEXT)")
+
+	// Check current DB version
+	rows, err := db.Query("PRAGMA user_version")
 	if err != nil {
 		log.Fatal(err)
+	}
+	rows.Next()
+	var dbVersion int
+	if err := rows.Scan(&dbVersion); err != nil {
+		log.Fatal(err)
+	}
+	rows.Close()
+
+	// If necessary, execute all missed migrations for the current DB
+	// When adding a new migration, remember to add 'fallthrough' to the previous one
+	switch dbVersion {
+	case 0:
+		runDBMigrationTx(db, 0, []string{"CREATE TABLE IF NOT EXISTS posts(ts INTEGER PRIMARY KEY, content TEXT)"})
 	}
 }
 
