@@ -49,6 +49,8 @@ func init() {
 	serverCmd.Flags().IntP("port", "p", 3773, "port on which the server will listen")
 	serverCmd.Flags().String("admin_user", "", "username used for admin privileges")
 	serverCmd.Flags().String("admin_pass", "", "password used for admin privileges")
+	serverCmd.Flags().String("bsky_handle", "", "BlueSky username for federation via API")
+	serverCmd.Flags().String("bsky_app_pass", "", "BlueSky app password for federation via API")
 	serverCmd.Flags().StringP("filepath", "f", "", "filepath for the SQLite DB file")
 
 	// Set defaults
@@ -59,6 +61,8 @@ func init() {
 	viper.BindPFlag("server.host", serverCmd.Flags().Lookup("host"))
 	viper.BindPFlag("server.admin_user", serverCmd.Flags().Lookup("admin_user"))
 	viper.BindPFlag("server.admin_pass", serverCmd.Flags().Lookup("admin_pass"))
+	viper.BindPFlag("server.bsky_handle", serverCmd.Flags().Lookup("bsky_handle"))
+	viper.BindPFlag("server.bsky_app_pass", serverCmd.Flags().Lookup("bsky_app_pass"))
 	viper.BindPFlag("sqlite.filepath", serverCmd.Flags().Lookup("filepath"))
 
 	// Binding Environment Variables to Viper
@@ -66,6 +70,8 @@ func init() {
 	viper.BindEnv("server.host", "CRNT_SERVER_HOST")
 	viper.BindEnv("server.admin_user", "CRNT_SERVER_ADMIN_USER")
 	viper.BindEnv("server.admin_pass", "CRNT_SERVER_ADMIN_PASS")
+	viper.BindEnv("server.bsky_handle", "CRNT_SERVER_BSKY_HANDLE")
+	viper.BindEnv("server.bsky_app_pass", "CRNT_SERVER_BSKY_APP_PASS")
 	viper.BindEnv("sqlite.filepath", "CRNT_SQLITE_FILEPATH")
 
 }
