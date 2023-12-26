@@ -8,11 +8,19 @@
                 <textarea type="text" name="content"
                     placeholder="What are you thinking?"
                     required autofocus></textarea>
+                <div class="checkbox">
+                    <input type="checkbox" name="bsky_fed" checked />
+                    <label for="bsky_fed">Post to BlueSky?</label>
+                </div>
                 <button type="submit">Post</button>
             </form>
             <form class="delete" action="/author/delete" method="post">
                 <input type="text" name="time" placeholder="Post timestamp" required>
                 <button type="submit">Delete</button>
+                <div class="checkbox">
+                    <input type="checkbox" name="bsky_del" checked />
+                    <label for="bsky_del">Delete on BlueSky?</label>
+                </div>
             </form>
         </main>
         {{template "footer" .}}

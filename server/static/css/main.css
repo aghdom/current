@@ -112,7 +112,7 @@ textarea {
     font-size: 1em;
     padding: .5em .8em;
     color: var(--primary-text);
-    font-family: var(--secondary-font);
+    font-family: var(--primary-font);
     tab-size: 4;
 }
 
@@ -160,6 +160,21 @@ form button[type="submit"] {
 
 form button[type="submit"]:hover {
     background: var(--secondary-text);
+}
+
+input[type="checkbox"] {
+    transform: scale(1.5);
+}
+
+.checkbox {
+    float: left;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox input {
+    margin: 1em;
+    width: auto;
 }
 
 .post {

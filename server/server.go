@@ -218,20 +218,22 @@ func Run() {
 		})
 
 		r.Post("/author/post", func(w http.ResponseWriter, r *http.Request) {
-			data.CreatePost(r.FormValue("content")) // Should empty content be allowed?
+			bskyFed := r.FormValue("bsky_fed") == "on"
+			data.CreatePost(r.FormValue("content"), bskyFed) // Should empty content be allowed?
 			// Redirect back to the admin portal
 			w.Header().Add("Location", "/author")
 			w.WriteHeader(http.StatusSeeOther)
 		})
 
 		r.Post("/author/delete", func(w http.ResponseWriter, r *http.Request) {
+			bskyDel := r.FormValue("bsky_del") == "on"
 			ts, err := strconv.ParseInt(r.FormValue("time"), 10, 64)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 			tm := time.Unix(int64(ts), 0).UTC()
-			data.DeletePostByTime(tm)
+			data.DeletePostByTime(tm, bskyDel)
 			// Redirect back to the admin portal
 			w.Header().Add("Location", "/author")
 			w.WriteHeader(http.StatusSeeOther)

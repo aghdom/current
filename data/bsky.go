@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -82,6 +83,7 @@ func BskyCreatePost(content string, created time.Time) (string, error) {
 		log.Printf("Failed to encode BlueSky create post payload: %s", err.Error())
 		return "", err
 	}
+	log.Println(string(pldJson))
 	pldReader := bytes.NewReader(pldJson)
 
 	r, err := http.NewRequest(http.MethodPost, BSKY_XRPC_URI+"com.atproto.repo.createRecord", pldReader)
@@ -89,6 +91,7 @@ func BskyCreatePost(content string, created time.Time) (string, error) {
 		log.Printf("Failed to create BlueSky post request: %s", err.Error())
 		return "", err
 	}
+	r.Header.Add("Content-Type", "application/json")
 	r.Header.Add("Authorization", "Bearer "+session.AccessToken)
 
 	client := &http.Client{}
@@ -101,6 +104,10 @@ func BskyCreatePost(content string, created time.Time) (string, error) {
 
 	if res.StatusCode != http.StatusOK {
 		log.Printf("Failed to create BlueSky post, status code: %d", res.StatusCode)
+		body, error := ioutil.ReadAll(res.Body)
+		if error != nil {
+		}
+		log.Println(string(body))
 		return "", err
 	}
 
@@ -145,6 +152,7 @@ func BskyDeletePost(uri string) error {
 		log.Printf("Failed to delete BlueSky post request: %s", err.Error())
 		return err
 	}
+	r.Header.Add("Content-Type", "application/json")
 	r.Header.Add("Authorization", "Bearer "+session.AccessToken)
 
 	client := &http.Client{}
