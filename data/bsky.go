@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -104,10 +103,6 @@ func BskyCreatePost(content string, created time.Time) (string, error) {
 
 	if res.StatusCode != http.StatusOK {
 		log.Printf("Failed to create BlueSky post, status code: %d", res.StatusCode)
-		body, error := ioutil.ReadAll(res.Body)
-		if error != nil {
-		}
-		log.Println(string(body))
 		return "", err
 	}
 
