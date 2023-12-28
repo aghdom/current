@@ -4,10 +4,13 @@
     <body>
         {{template "header" .}}
         <main>
-            <form class="author" action="/author/post" method="post">
+            <form class="author" enctype="multipart/form-data" action="/author/post" method="post">
                 <textarea type="text" name="content"
                     placeholder="What are you thinking?"
                     required autofocus></textarea>
+                <label for="img">Select Image:</label>
+                <input class="input file-input" type="file" name="img" accept="image/png,image/jpeg">
+                <input type="text" name="img_alt" placeholder="Image Alt Text">
                 <div class="checkbox">
                     <input type="checkbox" name="bsky_fed" checked />
                     <label for="bsky_fed">Post to BlueSky?</label>

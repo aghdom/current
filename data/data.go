@@ -18,6 +18,8 @@ type Post struct {
 	Time    time.Time
 	Content []byte
 	BskyURI []byte
+	ImgURL  []byte
+	ImgAlt  []byte
 }
 
 // runDBMigrationTX runs SQL database migration queries in a single transaction.
@@ -52,6 +54,14 @@ func runDBMigrationTx(db *sql.DB, dbVersion int, queries []string) {
 	}
 }
 func InitDB() {
+	// Initialize image folder, if it doesn't exist
+	err := os.MkdirAll("db/imgs", os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	// Initialize SQLite DB
 	fp := viper.GetString("sqlite.filepath")
 	if _, err := os.Stat(fp); os.IsNotExist(err) {
 		_, createErr := os.Create(fp)
@@ -87,6 +97,10 @@ func InitDB() {
 	case 1:
 		// Introduced a 'bsky_uri' field to store BlueSky uri for deletion purposes in case of federation
 		runDBMigrationTx(db, 1, []string{"ALTER TABLE posts ADD bsky_uri TEXT"})
+		fallthrough
+	case 2:
+		// Introduced 'img_url' & 'img_alt' to store image info
+		runDBMigrationTx(db, 2, []string{"ALTER TABLE posts ADD img_url TEXT", "ALTER TABLE posts ADD img_alt TEXT"})
 	}
 }
 
@@ -129,7 +143,7 @@ func queryPosts(query string, args ...any) []Post {
 	for rows.Next() {
 		var post Post
 		var ts int64
-		if err := rows.Scan(&ts, &post.Content); err != nil {
+		if err := rows.Scan(&ts, &post.Content, &post.ImgURL, &post.ImgAlt); err != nil {
 			log.Fatal(err)
 		}
 		post.Time = time.Unix(ts, 0).Truncate(time.Second).UTC()
@@ -157,7 +171,7 @@ func queryPostsWithURI(query string, args ...any) []Post {
 	for rows.Next() {
 		var post Post
 		var ts int64
-		if err := rows.Scan(&ts, &post.Content, &post.BskyURI); err != nil {
+		if err := rows.Scan(&ts, &post.Content, &post.ImgURL, &post.ImgAlt, &post.BskyURI); err != nil {
 			log.Fatal(err)
 		}
 		post.Time = time.Unix(ts, 0).Truncate(time.Second).UTC()
@@ -169,13 +183,13 @@ func queryPostsWithURI(query string, args ...any) []Post {
 
 func GetPosts(page, count int, query string) []Post {
 	if query != "" {
-		return queryPosts("SELECT ts,content FROM posts WHERE content LIKE ? ORDER BY ts DESC LIMIT ?,?", "%"+query+"%", count*(page-1), count)
+		return queryPosts("SELECT ts,content,img_url,img_alt FROM posts WHERE content LIKE ? ORDER BY ts DESC LIMIT ?,?", "%"+query+"%", count*(page-1), count)
 	}
-	return queryPosts("SELECT ts,content FROM posts ORDER BY ts DESC LIMIT ?,?", count*(page-1), count)
+	return queryPosts("SELECT ts,content,img_url,img_alt FROM posts ORDER BY ts DESC LIMIT ?,?", count*(page-1), count)
 }
 
 func GetPostByTime(tm time.Time) (Post, bool) {
-	posts := queryPostsWithURI("SELECT ts,content,bsky_uri FROM posts WHERE ts == ? ORDER BY ts DESC", tm.Unix())
+	posts := queryPostsWithURI("SELECT ts,content,img_url,img_alt,bsky_uri FROM posts WHERE ts == ? ORDER BY ts DESC", tm.Unix())
 	if len(posts) > 0 {
 		return posts[0], true
 	}
@@ -183,7 +197,7 @@ func GetPostByTime(tm time.Time) (Post, bool) {
 }
 
 func GetPostOnDate(dt time.Time) []Post {
-	return queryPosts("SELECT ts,content FROM posts WHERE ? <= ts AND ts < ? ORDER BY ts DESC", dt.Unix(), dt.Add(24*time.Hour).Unix())
+	return queryPosts("SELECT ts,content,img_url,img_alt FROM posts WHERE ? <= ts AND ts < ? ORDER BY ts DESC", dt.Unix(), dt.Add(24*time.Hour).Unix())
 }
 
 func insertPost(post Post) {
@@ -194,15 +208,14 @@ func insertPost(post Post) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO posts(ts, content, bsky_uri) VALUES (?, ?, ?);", post.Time.Unix(), post.Content, post.BskyURI)
+	_, err = db.Exec("INSERT INTO posts(ts, content, img_url, img_alt, bsky_uri) VALUES (?, ?, ?, ?, ?);", post.Time.Unix(), post.Content, post.ImgURL, post.ImgAlt, post.BskyURI)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func CreatePost(content string, bskyFed bool) {
+func CreatePost(t time.Time, content string, imgUrl string, imgAlt string, bskyFed bool) {
 	var bskyUri string
-	t := time.Now().UTC()
 	if bskyFed {
 		uri, err := BskyCreatePost(content, t)
 		if err != nil {
@@ -214,6 +227,8 @@ func CreatePost(content string, bskyFed bool) {
 		Time:    t.Truncate(time.Second),
 		Content: []byte(content),
 		BskyURI: []byte(bskyUri),
+		ImgURL:  []byte(imgUrl),
+		ImgAlt:  []byte(imgAlt),
 	})
 }
 
@@ -232,16 +247,31 @@ func deletePost(tm time.Time) {
 }
 
 func DeletePostByTime(tm time.Time, bskyDel bool) {
-	if bskyDel {
-		post, ok := GetPostByTime(tm)
-		if !ok {
-			return
+	post, ok := GetPostByTime(tm)
+	if !ok {
+		return
+	}
+	piURL := string(post.ImgURL)
+	if piURL != "" {
+		if err := os.Remove(piURL); err != nil {
+			log.Fatal(err)
 		}
+	}
+	if bskyDel {
 		if err := BskyDeletePost(string(post.BskyURI)); err != nil {
 			log.Fatal(err)
 		}
 	}
 	deletePost(tm)
+}
+
+func transformFeedPostContent(post Post) string {
+	ctnt := string(markdown.ToHTML(markdown.NormalizeNewlines(post.Content), nil, nil))
+	if post.ImgURL != nil {
+		img := fmt.Sprintf("<a href=\"%s\"><img loading=\"lazy\" src=\"%s\" alt=\"%s\" /></a>", post.ImgURL, post.ImgURL, post.ImgAlt)
+		ctnt = fmt.Sprintf("%s %s", ctnt, img)
+	}
+	return ctnt
 }
 
 func getFeed() *feeds.Feed {
@@ -252,7 +282,7 @@ func getFeed() *feeds.Feed {
 		Author:      &feeds.Author{Name: "Dominik Ágh", Email: "agh.dominik@gmail.com"},
 	}
 
-	posts := queryPosts("SELECT ts,content FROM posts ORDER BY ts DESC")
+	posts := queryPosts("SELECT ts,content,img_url,img_alt FROM posts ORDER BY ts DESC")
 	feed.Created = posts[0].Time
 
 	for _, post := range posts {
@@ -260,7 +290,7 @@ func getFeed() *feeds.Feed {
 			Title:   post.Time.Format("2006/01/02 15:04"),
 			Link:    &feeds.Link{Href: fmt.Sprintf("https://current.aghdom.eu/posts/%d", post.Time.Unix())},
 			Author:  &feeds.Author{Name: "Dominik Ágh", Email: "agh.dominik@gmail.com"},
-			Content: string(markdown.ToHTML(markdown.NormalizeNewlines(post.Content), nil, nil)),
+			Content: transformFeedPostContent(post),
 			Created: post.Time,
 		})
 	}

@@ -4,9 +4,12 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -17,6 +20,8 @@ import (
 
 	"github.com/aghdom/current/data"
 )
+
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024 // 5MB
 
 type ServerConfig struct {
 	Host          string
@@ -64,11 +69,17 @@ func parseMd(md []byte) []byte {
 }
 
 func transformPost(post data.Post) FeedPost {
+	ctnt := string(parseMd(post.Content))
+	if post.ImgURL != nil {
+		img := fmt.Sprintf("<a href=\"%s\"><img loading=\"lazy\" src=\"%s\" alt=\"%s\" /></a>", post.ImgURL, post.ImgURL, post.ImgAlt)
+		ctnt = fmt.Sprintf("%s %s", ctnt, img)
+	}
+
 	return FeedPost{
 		Date:    post.Time.Format("2006/01/02"),
 		Time:    post.Time.Format("15:04"),
 		Unix:    post.Time.Unix(),
-		Content: template.HTML(parseMd(post.Content)),
+		Content: template.HTML(ctnt),
 	}
 }
 
@@ -218,8 +229,48 @@ func Run() {
 		})
 
 		r.Post("/author/post", func(w http.ResponseWriter, r *http.Request) {
+			t := time.Now().UTC()
+
+			r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
+			if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {
+				log.Println(err.Error())
+				http.Error(w, "The uploaded file is too big. Please choose an file that's less than 5MB in size", http.StatusBadRequest)
+				return
+			}
+
+			file, fileHeader, err := r.FormFile("img")
+			if err != nil && err != http.ErrMissingFile {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			imgAlt := r.FormValue("img_alt")
+
+			var imgUrl string
+			if file != nil {
+				defer file.Close()
+				// Create a new file in the uploads directory
+				imgPath := fmt.Sprintf("db/imgs/%d%s", t.Unix(), filepath.Ext(fileHeader.Filename))
+				dst, err := os.Create(imgPath)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				defer dst.Close()
+
+				// Copy the uploaded file to the filesystem
+				// at the specified destination
+				_, err = io.Copy(dst, file)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				imgUrl = imgPath
+			}
+
 			bskyFed := r.FormValue("bsky_fed") == "on"
-			data.CreatePost(r.FormValue("content"), bskyFed) // Should empty content be allowed?
+			data.CreatePost(t, r.FormValue("content"), imgUrl, imgAlt, bskyFed) // Should empty content be allowed?
 			// Redirect back to the admin portal
 			w.Header().Add("Location", "/author")
 			w.WriteHeader(http.StatusSeeOther)
@@ -247,6 +298,9 @@ func Run() {
 	}
 	fs := http.FileServer(http.FS(sFS))
 	r.Handle("/s/*", http.StripPrefix("/s/", fs))
+
+	// serve uploaded images
+	r.Handle("/db/imgs/*", http.StripPrefix("/db/imgs/", http.FileServer(http.Dir("./db/imgs"))))
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
 	fmt.Println("Listening on " + addr)
