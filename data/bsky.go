@@ -144,7 +144,7 @@ func parseMentions(content string) []bskyFacet {
 
 func parseLinks(content string) (string, []bskyFacet) {
 	var links []bskyFacet
-	re := regexp.MustCompile(`\[(?P<text>.+)\]\((?P<target>.+)\)`)
+	re := regexp.MustCompile(`\[(?P<text>[^\[\]]+)\]\((?P<target>[^\)]+)\)`)
 	for {
 		loc := re.FindStringSubmatchIndex(content)
 		if loc == nil {
