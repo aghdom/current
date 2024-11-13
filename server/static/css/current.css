@@ -1,0 +1,363 @@
+/* Heavily inspired by https://github.com/thesephist/stream/blob/main/static/css/main.css */
+
+body {
+    --primary-bg: #1d1e20;
+    --primary-text: #ebebeb;
+    --secondary-bg: #3d3e40;
+    --secondary-text: #a4a4a4;
+    --code-bg: #323232;
+    --code-text: #c3c3c3;
+    --primary-font: monospace;
+    --secondary-font: monospace;
+}
+
+h1,h2 {
+    letter-spacing: 0.05em;
+    font-weight: normal;
+}
+
+.desktop {
+    display: none;
+}
+
+.mobile {
+    display: inline;
+}
+
+.tablet {
+    display: inline;
+}
+
+
+@media (min-width: 620px) {
+    .desktop {
+    display: inline;
+    }
+}
+
+@media (min-width: 620px) {
+    .mobile {
+    display: none;
+    }
+}
+
+header, h1, main {
+    width: calc(100% - 32px);
+    max-width: 860px;
+    margin: 1em auto;
+}
+
+.heading {
+    font-family: var(--secondary-font);
+    text-align: center;
+}
+
+.heading h1 {
+    font-size: var(--step-5);
+    margin-bottom: 0.5em;
+}
+
+.heading h3 {
+    font-weight: normal;
+    color: var(--secondary-text);
+    font-size: var(--step-1);
+    border-bottom: 0;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header .logo {
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 1em;
+}
+
+header a, header button {
+    display: inline;
+    background: transparent;
+    color: var(--primary-text);
+    text-decoration: none;
+    padding: 0.5em 0;
+}
+
+header a:hover, header button:hover {
+    text-decoration: underline;
+}
+
+.about .post-content {
+    width: auto;
+}
+
+.subtle {
+    color: var(--secondary-text)
+}
+
+input, button, textarea {
+    font-size: 1em;
+    padding: .5em .8em;
+    color: var(--primary-text);
+    font-family: var(--primary-font);
+    tab-size: 4;
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--secondary-text);
+}
+
+form {
+    position: relative;
+    margin-bottom: 2em;
+    overflow: hidden;
+    padding: .5em;
+}
+
+form input, form textarea {
+    display: block;
+    border-radius: 25px;
+    border: 0;
+    background: var(--secondary-bg);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+form textarea {
+    min-height: 30vh;
+    line-height: 1.5em;
+    resize: vertical;
+}
+
+form input:focus, form textarea:focus {
+    outline: 0;
+}
+
+form button[type="submit"] {
+    border-radius: 25px;
+    border: 0;
+    color: var(--primary-bg);
+    background: var(--primary-text);
+    margin-top: .5em;
+    float: right;
+    text-decoration: none;
+}
+
+form button[type="submit"]:hover {
+    background: var(--secondary-text);
+}
+
+form button[type="submit"].blue {
+    background-color: var(--blue);
+}
+
+form button[type="submit"].blue:hover {
+    background-color: var(--primary-text);
+}
+
+form button[type="submit"].warning {
+    background-color: var(--red);
+}
+
+form button[type="submit"].warning:hover {
+    background-color: var(--primary-text);
+}
+
+
+input[type="checkbox"] {
+    transform: scale(1.5);
+}
+
+.checkbox {
+    float: left;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox input {
+    margin: 1em;
+    width: auto;
+}
+
+.post {
+    margin-bottom: 2.5em;
+    word-break: break-word;
+}
+
+.post .post-time {
+    font-family: var(--secondary-font);
+    font-size: var(--step--1);
+    color: var(--secondary-text);
+    margin-top: 0.25em;
+}
+
+.post .post-time a {
+    color: var(--secondary-text);
+    text-decoration: none;
+}
+
+.post .post-time a:hover {
+    text-decoration: underline;
+}
+
+/* Markdown styling */
+.post-content h1, .post-content h2, .post-content h3 {
+    margin: .75em 0 .5em 0;
+}
+
+.post-content h1 {
+    font-size: var(--step-3);
+}
+
+.post-content h2 {
+    font-size: var(--step-2);
+}
+
+.post-content h3 {
+    font-size: var(--step-1);
+}
+
+.post-content p, .post-content li {
+    font-family: sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.5em;
+    max-width: 60ch;
+}
+
+.post-content ul, .post-content ol {
+    padding-left: 3ch;
+}
+
+.post-content h4, .post-content h5, .post-content h6 {
+    font-size: 1em;
+}
+
+.post-content a {
+    color: var(--primary-text);
+    text-decoration: underline;
+}
+
+.post-content a:hover {
+    color: var(--blue);
+    text-decoration: underline;
+}
+
+.post-content s, .post-content del, .post-content strike {
+    color: var(--secondary-text);
+}
+
+.post-content code, .post-content pre {
+    color: var(--code-text);
+    background: var(--code-bg);
+    font-size: 1em;
+    font-family: 'Fira Code', 'IBM Plex Mono', 'Menlo', 'Monaco', monospace;
+    word-break: initial;
+}
+
+.post-content pre {
+    border-radius: 6px;
+    box-sizing: border-box;
+    max-height: 20ch;
+    padding: 12px 8px;
+    overflow-x: auto;
+}
+
+.post-content pre code {
+    padding: 0;
+}
+
+.post-content code {
+    padding: 2px 5px;
+    border-radius: 6px;
+}
+
+.post-content blockquote {
+    margin: 0;
+    color: var(--code-text);
+    border-left: 4px solid var(--code-bg);
+    padding-left: 1em;
+    display: block;
+}
+
+.post-content img {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 6px;
+}
+
+@media only screen and (min-width: 750px) {
+    .post {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .post-time {
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 80px;
+        padding-right: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .post-content {
+        width: 0;
+        flex-shrink: 1;
+        flex-grow: 1;
+    }
+
+    .post-content :first-child {
+        margin-top: 0;
+    }
+}
+
+.pagination {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: .5em;
+}
+
+.pagination a {
+    display: inline;
+    color: var(--primary-text);
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    padding-top: 2em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+footer .divider {
+    padding: 0 0.5em;
+}
+
+footer a {
+    display: inline;
+    color: var(--primary-text);
+    background: transparent;
+    text-decoration: none;
+    padding: 0.5em 0;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}

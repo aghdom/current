@@ -108,8 +108,8 @@ func Run() {
 			}
 		}
 		pd := PageData{
-			Title:    "Dom's current",
-			SubTitle: "My personal micro-blog",
+			Title:    "current",
+			SubTitle: "my personal micro-blog",
 			Search:   true,
 			PrevPage: int(pageNum) - 1,
 		}
