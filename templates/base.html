@@ -46,3 +46,76 @@
     </nav>
 </footer>
 {{end}}
+
+
+{{define "bubbles"}}
+<style>
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+</style>
+<canvas></canvas>
+<script>
+    // Bubbles stolen from https://todepond.com
+    const canvas = document.querySelector("canvas");
+    const context = canvas.getContext("2d");
+    
+    document.body.onresize = () => {
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    };
+    
+    document.body.onresize();
+    
+    const bubbles = [];
+    
+    const draw = () => {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = "#3d3e40";
+    context.lineWidth = 2;
+    for (const raindrop of bubbles) {
+    context.beginPath();
+    context.arc(raindrop.x, raindrop.y, raindrop.size, 0, Math.PI * 2, false);
+    context.stroke();
+    }
+    };
+    
+    const update = (delta) => {
+    if (Math.random() < delta * 0.5) {
+    const size = 25 + Math.random() * 50;
+    bubbles.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height + size,
+        size,
+        speed: 50 + Math.random() * 50,
+    });
+    }
+    
+    for (let i = 0; i < bubbles.length; i++) {
+    const bubble = bubbles[i];
+    bubble.y -= bubble.speed * delta;
+    if (bubble.y < -bubble.size) {
+        bubbles.splice(i, 1);
+        i--;
+    }
+    }
+    };
+    
+    let lastTime = 0;
+    const loop = (time) => {
+    const delta = (time - lastTime) / 1000;
+    lastTime = time;
+    update(delta);
+    draw();
+    requestAnimationFrame(loop);
+    };
+    
+    loop();
+</script>
+{{end}}

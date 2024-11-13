@@ -15,6 +15,7 @@ body {
     --br-yellow: #ffd500;
     --green: #96e231;
     --blue: #3196e2;
+    --red: #e23149;
     --purple: #7e31e2;
     --ob-gradient: linear-gradient(
         135deg,
@@ -122,6 +123,16 @@ button.green:hover {
 a.purple:hover,
 button.purple:hover {
     background-color: var(--purple);
+    color: var(--primary-bg);
+}
+
+.warning {
+    color: var(--red);
+}
+
+a.warning:hover,
+button.warning:hover {
+    background-color: var(--red);
     color: var(--primary-bg);
 }
 

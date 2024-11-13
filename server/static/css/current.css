@@ -141,17 +141,35 @@ form input:focus, form textarea:focus {
 }
 
 form button[type="submit"] {
-    border-radius: 5px;
+    border-radius: 25px;
     border: 0;
     color: var(--primary-bg);
     background: var(--primary-text);
     margin-top: .5em;
     float: right;
+    text-decoration: none;
 }
 
 form button[type="submit"]:hover {
     background: var(--secondary-text);
 }
+
+form button[type="submit"].blue {
+    background-color: var(--blue);
+}
+
+form button[type="submit"].blue:hover {
+    background-color: var(--primary-text);
+}
+
+form button[type="submit"].warning {
+    background-color: var(--red);
+}
+
+form button[type="submit"].warning:hover {
+    background-color: var(--primary-text);
+}
+
 
 input[type="checkbox"] {
     transform: scale(1.5);

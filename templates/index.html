@@ -5,7 +5,7 @@
         {{template "header" .}}
         <div class="heading">
         {{if .Title}}
-            <h1>{{.Title}}</h1>
+            <h1 class="blue"><div class="desktop">🌊 </div>{{.Title}}</h1>
         {{end}}
         {{if .SubTitle}}
             <h3>{{.SubTitle}}</h3>
@@ -39,5 +39,6 @@
         </main>
         {{template "footer" .}}
     </body>
+    {{template "bubbles" .}}
 </html>
 {{end}}
