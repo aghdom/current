@@ -1,16 +1,4 @@
 /* Heavily inspired by https://github.com/thesephist/stream/blob/main/static/css/main.css */
-
-body {
-    --primary-bg: #1d1e20;
-    --primary-text: #ebebeb;
-    --secondary-bg: #3d3e40;
-    --secondary-text: #a4a4a4;
-    --code-bg: #323232;
-    --code-text: #c3c3c3;
-    --primary-font: monospace;
-    --secondary-font: monospace;
-}
-
 h1,h2 {
     letter-spacing: 0.05em;
     font-weight: normal;
@@ -66,6 +54,7 @@ header, h1, main {
 
 header {
     display: flex;
+    margin-top: 0;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -118,7 +107,6 @@ form {
     position: relative;
     margin-bottom: 2em;
     overflow: hidden;
-    padding: .5em;
 }
 
 form input, form textarea {
@@ -303,7 +291,7 @@ input[type="checkbox"] {
     .post-time {
         flex-grow: 0;
         flex-shrink: 0;
-        width: 80px;
+        width: 6em;
         padding-right: 1em;
         display: flex;
         flex-direction: column;
