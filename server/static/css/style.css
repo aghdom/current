@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
+
 body {
     --primary-bg: #1d1e20;
     --primary-text: #ebebeb;
     --secondary-bg: #3d3e40;
     --secondary-text: #a4a4a4;
-    --code-bg: #323232;
+    --code-bg: #32323280;
     --code-text: #c3c3c3;
 
     --orange: #e27e31;
@@ -15,7 +17,7 @@ body {
 }
 
 body {
-    font-family: monospace;
+    font-family: "Roboto Serif", monospace;
     font-size: var(--step-0);
     color: var(--primary-text);
     background: var(--primary-bg);
@@ -25,6 +27,10 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+p {
+    line-height: 1.5;
 }
 
 h1 {
@@ -44,8 +50,11 @@ h2 {
 
 h3 {
     font-weight: normal;
-    font-size: var(--step-2);
-    border-bottom: var(--secondary-text) 1px solid;
+    font-size: var(--step-2); 
+}
+
+.subtitle {
+    font-weight: lighter;
 }
 
 a,
@@ -61,6 +70,10 @@ button:hover {
     color: var(--blue);
 }
 
+
+.grey {
+    color: var(--secondary-text);
+}
 
 .orange {
     color: var(--orange);
@@ -119,6 +132,49 @@ ul li {
 .subtle {
     font-size: var(--step--1);
     color: var(--secondary-text);
+}
+
+.huge {
+    font-size: 10em;
+}
+
+hr {
+    margin: 0;
+    border: var(--secondary-bg) 1px solid;
+}
+
+blockquote {
+  color: #8eb66d;
+  background-color: #2d2e3042;
+  margin: 0px;
+  padding: 0 1.25em;
+  border-left: 2px #8eb66d solid;
+}
+
+code {
+    font-family: monospace;
+}
+
+pre {
+    padding: 1em;
+    border-radius: 10px;
+    box-sizing: border-box;
+    max-height: 42ch;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-bg) var(--code-bg);
+}
+
+pre code {
+    word-break: initial;
+}
+
+/* Style for non-highlighted code blocks */
+li code, p code, h1 code, h2 code, h3 code {
+    padding: 2px 5px;
+    border-radius: 6px;
+    background-color: var(--code-bg);
+    color: var(--code-text);
 }
 
 /* Fluid type scale */

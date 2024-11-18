@@ -46,7 +46,7 @@ header, h1, main {
 }
 
 .heading h3 {
-    font-weight: normal;
+    font-weight: lighter;
     color: var(--secondary-text);
     font-size: var(--step-1);
     border-bottom: 0;
@@ -81,6 +81,12 @@ header a, header button {
 
 header a:hover, header button:hover {
     text-decoration: underline;
+}
+
+.about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .about .post-content {
@@ -213,7 +219,7 @@ input[type="checkbox"] {
 }
 
 .post-content p, .post-content li {
-    font-family: sans-serif;
+    font-family: "Roboto Serif", sans-serif;
     font-size: var(--step-0);
     line-height: 1.5em;
     max-width: 60ch;
