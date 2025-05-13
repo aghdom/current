@@ -114,9 +114,7 @@ input, button, textarea {
 }
 
 form {
-    position: relative;
     margin-bottom: 2em;
-    overflow: hidden;
 }
 
 form input, form textarea {
