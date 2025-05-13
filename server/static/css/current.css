@@ -74,13 +74,22 @@ nav {
 header a, header button {
     display: inline;
     background: transparent;
-    color: var(--primary-text);
     text-decoration: none;
     padding: 0.5em 0;
 }
 
 header a:hover, header button:hover {
     text-decoration: underline;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-icon {
+    padding-right: 0.2em;
 }
 
 .about {
@@ -100,13 +109,8 @@ header a:hover, header button:hover {
 input, button, textarea {
     font-size: 1em;
     padding: .5em .8em;
-    color: var(--primary-text);
     font-family: var(--primary-font);
     tab-size: 4;
-}
-
-input::placeholder, textarea::placeholder {
-    color: var(--secondary-text);
 }
 
 form {
@@ -119,7 +123,7 @@ form input, form textarea {
     display: block;
     border-radius: 25px;
     border: 0;
-    background: var(--secondary-bg);
+    background: var(--secondary-text);
     width: 100%;
     box-sizing: border-box;
 }
@@ -233,16 +237,6 @@ input[type="checkbox"] {
     font-size: 1em;
 }
 
-.post-content a {
-    color: var(--primary-text);
-    text-decoration: underline;
-}
-
-.post-content a:hover {
-    color: var(--blue);
-    text-decoration: underline;
-}
-
 .post-content s, .post-content del, .post-content strike {
     color: var(--secondary-text);
 }
@@ -354,4 +348,10 @@ footer a {
 
 footer a:hover {
     text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+   form input, form textarea {
+    background-color: var(--secondary-bg);
+   } 
 }

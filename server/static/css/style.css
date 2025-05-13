@@ -1,36 +1,41 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    --primary-bg: #1d1e20;
-    --primary-text: #ebebeb;
     --secondary-bg: #3d3e40;
     --secondary-text: #a4a4a4;
     --code-bg: #32323280;
     --code-text: #c3c3c3;
-
-    --orange: #e27e31;
-    --br-yellow: #ffd500;
-    --green: #96e231;
-    --blue: #3196e2;
-    --red: #e23149;
-    --purple: #7e31e2;
 }
 
 body {
     font-family: "Roboto Serif", monospace;
     font-size: var(--step-0);
-    color: var(--primary-text);
-    background: var(--primary-bg);
     max-width: 750px;
     margin: 0 auto;
     padding: 1em 0.5em;
-    display: flex;
-    flex-direction: column;
     min-height: 100vh;
 }
 
 p {
     line-height: 1.5;
+    margin: 1em 0;
+}
+
+
+header {
+    margin: 0 30px 0 0;
+    float: left;
+}
+
+
+nav ul li {
+    list-style: none;
+    font-size: var(--step--1);
 }
 
 h1 {
@@ -45,7 +50,7 @@ h2 {
     font-size: var(--step-3);
     margin: 0.5em 0;
     padding: 0.5em 0;
-    border-bottom: var(--secondary-text) 1px solid;
+    border-bottom: 1px solid;
 }
 
 h3 {
@@ -57,17 +62,25 @@ h3 {
     font-weight: lighter;
 }
 
-a,
-button {
+a {
+    color: #000;
+}
+
+main * a,
+nav a,
+main * button {
     display: inline;
-    color: var(--primary-text);
     background: transparent;
+    color: #000;
     text-decoration: underline;
 }
 
-a:hover,
-button:hover {
-    color: var(--blue);
+main * a:hover,
+nav a:hover,
+main * button:hover {
+    background: #000;
+    color: #fff;
+    text-decoration: none;
 }
 
 
@@ -75,58 +88,18 @@ button:hover {
     color: var(--secondary-text);
 }
 
-.orange {
-    color: var(--orange);
+main ul, main ol {
+    margin: 1em 0;
+    padding-left: 2em;
 }
 
-a.orange:hover,
-button.orange:hover {
-    background-color: var(--orange);
-    color: var(--primary-bg);
-}
-
-.blue {
-    color: var(--blue);
-}
-
-a.blue:hover,
-button.blue:hover {
-    background-color: var(--blue);
-    color: var(--primary-bg);
-}
-
-.green{
-    color: var(--green);
-}
-
-a.green:hover,
-button.green:hover {
-    background-color: var(--green);
-    color: var(--primary-bg);
-}
-
-.purple{
-    color: var(--purple);
-}
-
-a.purple:hover,
-button.purple:hover {
-    background-color: var(--purple);
-    color: var(--primary-bg);
-}
-
-.warning {
-    color: var(--red);
-}
-
-a.warning:hover,
-button.warning:hover {
-    background-color: var(--red);
-    color: var(--primary-bg);
-}
-
-ul li {
+main ul li {
     list-style: " ⇝ ";
+    margin: 0.2em 0;
+}
+
+main ol li {
+    margin: 0.2em;
 }
 
 .subtle {
@@ -144,11 +117,14 @@ hr {
 }
 
 blockquote {
-  color: #8eb66d;
   background-color: #2d2e3042;
-  margin: 0px;
+  margin: 0.5em 0;
   padding: 0 1.25em;
-  border-left: 2px #8eb66d solid;
+  border-left: 2px var(--secondary-text) solid;
+}
+
+hr {
+    margin: 1em 0; 
 }
 
 code {
@@ -170,11 +146,39 @@ pre code {
 }
 
 /* Style for non-highlighted code blocks */
-li code, p code, h1 code, h2 code, h3 code {
+li code, p code {
     padding: 2px 5px;
     border-radius: 6px;
     background-color: var(--code-bg);
     color: var(--code-text);
+}
+
+img{
+    filter: grayscale(1);
+}
+
+@media (prefers-color-scheme: dark) {
+    *{
+       color: #fff; 
+    }
+    
+    body {
+        background: #000;
+    }
+    a, main a, nav a {
+        color: #fff;
+    }
+    main a em {
+        text-decoration: underline;
+    }
+    main a:hover, main button:hover, main a em:hover, nav a:hover {
+        background-color: #fff;
+        color:#000;
+        text-decoration: none;
+    }
+    img[src*="svg"], img[src*="png"] { 
+        filter:invert(1) hue-rotate(180deg) 
+    }
 }
 
 /* Fluid type scale */
